@@ -1,0 +1,14 @@
+FROM node:18-slim AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --production
+COPY . .
+
+FROM node:18-slim
+RUN useradd -ms /bin/bash apiuser
+WORKDIR /tp-API
+COPY --from=build /tp-API/node_modules ./node_modules
+COPY --from=build /tp-API/dist ./dist
+USER apiuser
+EXPOSE 8080
+CMD ["node", "dist/API.js"]
